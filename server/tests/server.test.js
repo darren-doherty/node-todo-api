@@ -134,3 +134,70 @@ describe('DELETE /todos/:id', () => {
             .end(done);
     });
 });
+
+describe('PATCH /todos/:id', () => {
+
+    it('should update a specific todo', (done) => {
+        const todoId = sampleTodos[0]._id.toHexString();
+        var body = {text: "new updated todo text", completed: true};
+        request(app).patch(`/todos/${todoId}`)
+            .send(body)
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo._id).toBe(todoId);
+            })
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                }
+
+                Todo.findById(todoId).then((todo) => {
+                    expect(todo.text).toBe(body.text);
+                    expect(todo.completed).toBe(body.completed);
+                    expect(typeof todo.completedAt).toBe('number');
+                    done();
+                }).catch((err) => done(err));
+            });
+    });
+
+    it('should clear completedAt when todo is not completed', (done) => {
+        const todoId = sampleTodos[0]._id.toHexString();
+        var body = {text: "new updated todo text", completed: false};
+        request(app).patch(`/todos/${todoId}`)
+            .send(body)
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo._id).toBe(todoId);
+            })
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                }
+
+                Todo.findById(todoId).then((todo) => {
+                    expect(todo.text).toEqual(body.text);
+                    expect(todo.completed).toBe(body.completed);
+                    expect(todo.completedAt).toBeNull();
+                    done();
+                }).catch((err) => done(err));
+            });
+    });
+    
+    it('should return a 404 when todo does not exist', (done) => {
+        const todoId = new ObjectID().toHexString();
+        var body = {text: "new updated todo text", completed: true};
+        request(app).patch(`/todos/${todoId}`)
+            .send(body)
+            .expect(404)
+            .end(done);
+    });
+    
+    it('should return a 404 when id is invalid', (done) => {
+        const todoId = '1234';
+        var body = {text: "new updated todo text", completed: true};
+        request(app).patch(`/todos/${todoId}`)
+            .send(body)
+            .expect(404)
+            .end(done);
+    });
+});
