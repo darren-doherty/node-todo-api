@@ -314,3 +314,46 @@ describe("POST /users", () => {
       });
   });
 });
+
+describe("POST /users/login", () => {
+  it("should login a user with valid credentials and return auth token", done => {
+    var email = initUsers[0].email;
+    var password = initUsers[0].password;
+
+    request(app)
+      .post("/users/login")
+      .send({ email, password })
+      .expect(200)
+      .expect(res => {
+        expect(typeof res.headers["x-auth"]).toBe("string");
+        expect(typeof res.body._id).toBe("string");
+        expect(res.body.email).toBe(email);
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        User.findById(initUsers[0]._id)
+          .then(user => {
+            expect(typeof user).toBe("object");
+            expect(user.password).not.toEqual(password);
+            expect(user.email).toBe(res.body.email);
+            expect(user._id.toHexString()).toBe(res.body._id);
+            done();
+          })
+          .catch(err => done(err));
+      });
+  });
+
+  it("should reject invalid login credentials", done => {
+    var email = "example@example.com";
+    var password = "abcd";
+
+    request(app)
+      .post("/users/login")
+      .send({ email, password })
+      .expect(400)
+      .end(done);
+  });
+});
