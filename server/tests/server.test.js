@@ -357,3 +357,34 @@ describe("POST /users/login", () => {
       .end(done);
   });
 });
+
+describe("DELETE /users/me/token", () => {
+  it("should logout a user if user is logged in and delete their token", done => {
+    request(app)
+      .delete("/users/me/token")
+      .set("x-auth", initUsers[0].tokens[0].token)
+      .send()
+      .expect(200)
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        User.findById(initUsers[0]._id)
+          .then(user => {
+            expect(user.tokens.length).toBe(0);
+            done();
+          })
+          .catch(err => done(err));
+      });
+  });
+
+  it("should return authorisation error if not logged in", done => {
+    request(app)
+      .delete("/users/me/token")
+      .set("x-auth", "invalid_token")
+      .send()
+      .expect(401)
+      .end(done);
+  });
+});
