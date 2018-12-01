@@ -315,8 +315,8 @@ describe("POST /users", () => {
       .send({ email, password })
       .expect(200)
       .expect(res => {
-        expect(typeof res.headers["x-auth"]).toBe("string");
-        expect(typeof res.body._id).toBe("string");
+        expect(res.headers["x-auth"]).toBeTruthy();
+        expect(res.body._id).toBeTruthy();
         expect(res.body.email).toBe(email);
       })
       .end((err, res) => {
@@ -390,8 +390,8 @@ describe("POST /users/login", () => {
       .send({ email, password })
       .expect(200)
       .expect(res => {
-        expect(typeof res.headers["x-auth"]).toBe("string");
-        expect(typeof res.body._id).toBe("string");
+        expect(res.headers["x-auth"]).toBeTruthy();
+        expect(res.body._id).toBeTruthy();
         expect(res.body.email).toBe(email);
       })
       .end((err, res) => {
