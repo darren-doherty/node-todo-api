@@ -12,9 +12,7 @@ A NodeJS RESTful API that uses MongoDB for persistent storage
 * Run MongoDB server
 * Run commands from command prompt or terminal
 
-## Commands ##
-### Run mongodb-connect script  ### 
-`node playground/mongodb-connect.js`
-### Run mongodb-find script  ### 
-`node playground/mongodb-find.js`
+## Commands 
+##### Run server script  ### 
+`npm start`
 
